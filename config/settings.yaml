@@ -1,0 +1,162 @@
+# ╔════════════════════════════════════════════════════════════╗
+# ║              ব্রো (Bro) — settings.yaml v3.0               ║
+# ╚════════════════════════════════════════════════════════════╝
+
+assistant:
+  name: "ব্রো"
+  name_en: "Bro"
+  version: "3.0"
+  language: "bn"
+  greeting: "হাই, আমি ব্রো। কী করতে বলবেন?"
+  greeting_en: "Hi, I'm Bro. What can I do for you?"
+
+wake_word:
+  keyword: "ব্রো"
+  keyword_en: "bro"
+  activation_phrase: "ব্রো স্টার্ট"
+  deactivation_phrase: "ব্রো অফ"
+  sensitivity: 0.7
+
+stt:
+  engine: "faster-whisper"
+  model_size: "small"
+  language: "bn"
+  fallback_language: "en"
+  device: "cpu"
+  compute_type: "int8"
+  beam_size: 5
+  vad_filter: true
+
+tts:
+  engine: "piper"
+  voice: "bn_BD-male-medium"
+  fallback_voice: "en_US-lessac-medium"
+  rate: 1.0
+  volume: 0.8
+
+cloud:
+  primary_provider: "google"
+  llm_model: "gemini-3.5-flash"
+  vision_model: "gemini-3.5-flash"
+  timeout: 30
+  max_retries: 3
+  fallback_order:
+    - "google"
+    - "siliconflow"
+    - "github_models"
+    - "groq"
+    - "local"
+
+  providers:
+    google:
+      base_url: "https://generativelanguage.googleapis.com/v1beta"
+      models:
+        llm: "gemini-3.5-flash"
+        vision: "gemini-3.5-flash"
+      max_tokens: 8192
+      temperature: 0.7
+
+    siliconflow:
+      base_url: "https://api.siliconflow.cn/v1"
+      models:
+        llm: "deepseek-ai/DeepSeek-V3"
+        reasoning: "deepseek-ai/DeepSeek-R1"
+        vision: "Qwen/Qwen2.5-VL-32B-Instruct"
+      max_tokens: 4096
+      temperature: 0.7
+
+    github_models:
+      base_url: "https://models.github.ai/inference"
+      models:
+        llm: "openai/gpt-4o"
+        vision: "openai/gpt-4o"
+      max_tokens: 4096
+      temperature: 0.7
+
+    groq:
+      base_url: "https://api.groq.com/openai/v1"
+      models:
+        llm: "llama-3.3-70b-versatile"
+        vision: "llama-3.2-11b-vision-preview"
+      max_tokens: 4096
+      temperature: 0.7
+
+local:
+  ollama_host: "http://localhost:11434"
+  models:
+    llm: "deepseek-r1:8b"
+    vision: "qwen3-vl:8b"
+    reasoning: "qwen3:8b"
+  timeout: 120
+
+optimization:
+  cache:
+    enabled: true
+    db_path: "data/cache.db"
+    ttl_seconds: 3600
+    max_entries: 10000
+  context:
+    max_tokens: 4096
+    compaction_strategy: "summarize"
+  scheduler:
+    strategy: "fastest_first"
+    health_check_interval: 60
+
+agents:
+  computer_use:
+    enabled: true
+    screenshot_interval: 0.5
+    safe_mode: true
+  shotcut:
+    enabled: true
+    output_dir: "data/video_output"
+  vscode_cua:
+    enabled: true
+    workspace_path: ""
+  vscode_agents_hub:
+    enabled: true
+  opencode_autopilot:
+    enabled: true
+  video_agent:
+    enabled: true
+  autovideo:
+    enabled: true
+    output_dir: "data/video_output"
+  chromaprint:
+    enabled: true
+  alex_core:
+    enabled: true
+    plugins_dir: "data/plugins"
+  keysersoze:
+    enabled: true
+  joshu:
+    enabled: true
+    prediction_threshold: 0.7
+  human_bot:
+    enabled: false
+  telegram:
+    enabled: false
+  bantz:
+    enabled: false
+  miniomni2:
+    enabled: false
+  just_agents:
+    enabled: true
+
+memory:
+  file: "data/bro_memory.json"
+  max_entries: 5000
+  auto_save: true
+
+logging:
+  level: "INFO"
+  file: "data/logs/bro.log"
+  max_size_mb: 50
+  backup_count: 5
+  console: true
+
+permission:
+  enabled: true
+  auto_approve_simple: true
+  timeout_seconds: 30
+  default_on_timeout: "skip"
