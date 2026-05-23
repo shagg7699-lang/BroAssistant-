@@ -59,17 +59,17 @@ class ResponseCache:
         log.info("ক্যাশ ডাটাবেস প্রস্তুত: %s", self.db_path)
 
     @staticmethod
-    def _make_key(prompt: str, model: str = "", provider: str = "") -> str:
-        raw = f"{provider}:{model}:{prompt}"
+    def _make_key(prompt: str, model: str = "", provider: str = "", context_hash: str = "") -> str:
+        raw = f"{provider}:{model}:{context_hash}:{prompt}"
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
-    async def get(self, prompt: str, model: str = "", provider: str = "") -> Optional[str]:
+    async def get(self, prompt: str, model: str = "", provider: str = "", context_hash: str = "") -> Optional[str]:
         if not _HAS_SQLITE:
             return None
         await self._init_db()
         assert self._db is not None
 
-        key = self._make_key(prompt, model, provider)
+        key = self._make_key(prompt, model, provider, context_hash)
         now = time.time()
 
         async with self._db.execute(
@@ -94,14 +94,14 @@ class ResponseCache:
         return None
 
     async def put(
-        self, prompt: str, response: str, model: str = "", provider: str = ""
+        self, prompt: str, response: str, model: str = "", provider: str = "", context_hash: str = ""
     ) -> None:
         if not _HAS_SQLITE:
             return
         await self._init_db()
         assert self._db is not None
 
-        key = self._make_key(prompt, model, provider)
+        key = self._make_key(prompt, model, provider, context_hash)
         now = time.time()
 
         await self._db.execute(

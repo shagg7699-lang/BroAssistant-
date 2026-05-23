@@ -153,7 +153,7 @@ class VideoAgent:
                 "format": fmt.get("format_name", "unknown"),
                 "video_codec": video_streams[0].get("codec_name") if video_streams else None,
                 "resolution": f"{video_streams[0].get('width')}x{video_streams[0].get('height')}" if video_streams else None,
-                "fps": eval(video_streams[0].get("r_frame_rate", "0/1")) if video_streams else 0,
+                "fps": (lambda r: int(r.split("/")[0]) / int(r.split("/")[1]) if "/" in r else float(r))(video_streams[0].get("r_frame_rate", "0/1")) if video_streams else 0,
                 "audio_codec": audio_streams[0].get("codec_name") if audio_streams else None,
             }
 

@@ -118,6 +118,7 @@ class AlexCorePlugin:
                     plugin = self.register_plugin(meta, module)
 
                     if hasattr(module, "on_load"):
+                        plugin.register_hook("load", module.on_load)
                         await plugin.trigger("load")
 
                     return {"status": "loaded", "plugin": meta.name}

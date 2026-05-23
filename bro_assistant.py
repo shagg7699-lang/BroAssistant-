@@ -4,6 +4,7 @@
 """
 
 import asyncio
+import hashlib
 import sys
 import time
 from pathlib import Path
@@ -177,10 +178,17 @@ class BroAssistant:
         # LLM চ্যাট
         return await self._llm_chat(text)
 
+    def _context_hash(self) -> str:
+        """সাম্প্রতিক কনভার্সেশন কনটেক্সটের হ্যাশ"""
+        recent = self._messages[-5:] if len(self._messages) > 5 else self._messages
+        raw = "|".join(f"{m['role']}:{m['content'][:100]}" for m in recent)
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
     async def _llm_chat(self, text: str) -> str:
         """ক্লাউড/লোকাল LLM দিয়ে চ্যাট"""
         # ক্যাশ চেক
-        cached = await self.cache.get(text)
+        ctx_hash = self._context_hash()
+        cached = await self.cache.get(text, context_hash=ctx_hash)
         if cached:
             log.info("ক্যাশ হিট")
             self.tts.speak(cached[:200])
@@ -206,7 +214,7 @@ class BroAssistant:
 
         if response:
             self._messages.append({"role": "assistant", "content": response})
-            await self.cache.put(text, response)
+            await self.cache.put(text, response, context_hash=ctx_hash)
             self.predictor.record_action("chat", text)
 
         self.tts.speak(response[:200] if response else "দুঃখিত, উত্তর পাওয়া যায়নি।")
